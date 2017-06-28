@@ -1,6 +1,5 @@
 //@flow
 import { NavigationActions } from 'react-navigation';
-import { ACTIONS } from '../reducers/navReducers';
 import { AppNavigator } from '../navigators/AppNavigator';
 
 export function goToPage(routeName: string, params:Object) {
