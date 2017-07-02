@@ -54,6 +54,7 @@ export const selectTripAndFetchData = (selectedTrip) => {
 export const addNewTrip = (name, uid, userName) => {
   var newTripKey = firebase.database().ref().child('trips').push().key;
   const tripInitData = {
+    id: newTripKey,
     name,
     transactions: [],
     users: [{id: uid, userName, active: true, amount: 0}],

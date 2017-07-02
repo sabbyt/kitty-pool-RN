@@ -9,15 +9,18 @@ import withHandlers from 'recompose/withHandlers';
 import withProps from 'recompose/withProps';
 import withState from 'recompose/withState';
 import map from 'lodash/map';
+import remove from 'lodash/remove';
+import forEach from 'lodash/forEach';
 
 import AppHeader from './components/layout/AppHeader';
 
-import { setPaymentDate, setPaymentTotal, setPaidBy, setPaymentDescription, removeUserSplit, addPaymentTag, clearPaymentForm } from '../actions/forms/addPaymentActions';
+import { setPaymentDate, setPaymentTotal, setPaidBy, setPaymentDescription, removeUserSplit, addPaymentTag } from '../actions/forms/addPaymentActions';
+import { addNewPayment } from '../actions/transactionActions';
 import { goBack } from '../actions/navActions';
 
 const PickerItem = Picker.Item;
 
-const AddPaymentContainer = ({ selectedTrip, selectPaidBy, paidByPicker, setPaidByPicker, dateValue, openDatePicker, setPaymentDate, setPaymentTotal, setPaidBy, setPaymentDescription, submitPayment }) => (
+const AddPaymentContainer = ({ selectPaidBy, paidByPicker, dateValue, openDatePicker, setPaymentTotal, setPaymentDescription, submitPayment, removeUserSplit, filteredUsers }) => (
   <Container>
     <AppHeader title='Add Payment' showBackButton={true}/>
     <Form>
@@ -29,16 +32,14 @@ const AddPaymentContainer = ({ selectedTrip, selectPaidBy, paidByPicker, setPaid
       </Item>
       <Item>
         <Input
+          keyboardType='numeric'
           onChangeText={setPaymentTotal}
           placeholder="Total" />
       </Item>
       <Picker
         selectedValue={paidByPicker}
-        onValueChange={(value) => {
-          console.log('Selected', value);
-          setPaidByPicker(value);
-        }}>
-        {map(selectedTrip.users, (option, index) => (
+        onValueChange={(value) => selectPaidBy(value)}>
+        {map(filteredUsers, (option, index) => (
           <Picker.Item
             key={index}
             label={option.userName}
@@ -51,6 +52,13 @@ const AddPaymentContainer = ({ selectedTrip, selectPaidBy, paidByPicker, setPaid
           placeholder="Description" />
       </Item>
     </Form>
+    {map(filteredUsers, (option, index) => (
+      <Button
+        key={index}
+        onPress={() => removeUserSplit({id: option.id, name: option.userName})}>
+        <Text>{option.userName}</Text><Text>X</Text>
+      </Button>
+    ))}
     <Button
       block
       onPress={submitPayment}>
@@ -67,14 +75,34 @@ export default compose(
       selectedTrip,
       addPayment
     }
-  }, { goBack, setPaymentDate, setPaymentTotal, setPaidBy, setPaymentDescription, removeUserSplit, addPaymentTag }),
-  withProps(({ addPayment }) => ({
-    dateValue: addPayment.date.length === 0 ? new Date() : addPayment.date
+  }, { goBack, setPaymentDate, setPaymentTotal, setPaidBy, setPaymentDescription, removeUserSplit, addPaymentTag, addNewPayment }),
+  withProps(({ addPayment, selectedTrip }) => ({
+    dateValue: addPayment.date.length === 0 ? new Date() : addPayment.date,
+    filteredUsers: selectedTrip.users
   })),
+  withProps(props => {
+    // Processing filtered array
+    forEach(props.addPayment.splitBetween, (splitUser) => remove(props.filteredUsers, (user) => splitUser.id == user.id))
+    return props
+  }),
+  // TODO: check that cannot remove all users from payment
   withState('paidByPicker', 'setPaidByPicker', ({ selectedTrip }) => selectedTrip.users[0].id),
   withHandlers({
-    submitPayment: ({ goBack }) => () => {
-      console.log('submitting payment');
+    submitPayment: ({ goBack, addPayment, selectedTrip, addNewPayment }) => () => {
+      let transactionPostBody = {
+        ...addPayment,
+        total: Number(addPayment.total)
+      };
+      // TODO: error checking
+      // return error if no Total
+      // return error if no description
+      if (transactionPostBody.date.length === 0) {
+        transactionPostBody.date = moment().toString();
+      }
+      if (transactionPostBody.paidBy.length === 0) {
+        transactionPostBody.paidBy = selectedTrip.users[0].id;
+      }
+      addNewPayment(selectedTrip, transactionPostBody);
       goBack();
     },
     openDatePicker: ({ setPaymentDate }) => async () => {
@@ -84,14 +112,17 @@ export default compose(
           mode: 'spinner'
         });
         if (action !== DatePickerAndroid.dismissedAction) {
-          setPaymentDate(moment(`${year}-${month+1}-${day}`, "YYYY-M-DD").format("YYYY-MM-DD"))
+          setPaymentDate(moment(`${year}-${month+1}-${day}`, "YYYY-M-DD").toString())
         }
       } catch ({ code, message }) {
         console.warn('Cannot open date picker', message);
       }
     },
-    selectPaidBy: () => (paidBySelected) => {
-      console.log('selected by', paidBySelected);
+    selectPaidBy: ({ setPaidBy, setPaidByPicker }) => (paidBySelected) => {
+      // Set redux state
+      setPaidBy(paidBySelected);
+      // Set local state
+      setPaidByPicker(paidBySelected);
     }
   })
 )(AddPaymentContainer)

@@ -41,9 +41,11 @@ export default (state=initialState, action) => {
         description: action.description
       }
     case ACTIONS.SET_SPLIT_BETWEEN:
+      var newSplit = [...state.splitBetween];
+      newSplit.push(action.user);
       return {
         ...state,
-        splitBetween: [...state.splitBetween].push(action.splitBetween)
+        splitBetween: newSplit
       }
     case ACTIONS.SET_PAYMENT_TAGS:
       return {

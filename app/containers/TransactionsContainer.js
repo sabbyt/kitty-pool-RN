@@ -14,7 +14,10 @@ import { goToPage } from '../actions/navActions';
 const TransactionsContainer = ({ selectedTrip, addPayment, transactionList }) => {
   const transactionsListView = transactionList.length !== 0 ? map(transactionList, (transaction, key) => (
     <ListItem key={key}>
-      <Text>{transaction}</Text>
+      <Text>{transaction.date}</Text>
+      <Text>{transaction.description}</Text>
+      <Text>{transaction.total}</Text>
+      <Text>{transaction.paidBy}</Text>
     </ListItem>
   )) : <ListItem><Text>NO TRANSACTIONS</Text></ListItem>
   return (

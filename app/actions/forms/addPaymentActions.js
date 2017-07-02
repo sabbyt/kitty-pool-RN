@@ -29,10 +29,10 @@ export const setPaymentDescription = (description) => {
   }
 }
 
-export const removeUserSplit = (splitBetween) => {
+export const removeUserSplit = (user) => {
   return {
     type: ACTIONS.SET_SPLIT_BETWEEN,
-    splitBetween
+    user
   }
 }
 
