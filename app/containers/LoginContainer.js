@@ -55,14 +55,14 @@ export default compose(
       if (verified) {
         loginApi(login)
           .then(data => {
-            console.log('Signed in', data);
+            // If successful, sets user id to local
             setUserUID(data.uid);
             clearLoginForm()
             goToHome();
-          });
-      } else {
-        console.log('Could not login user');
+          })
+          .catch(err => console.log('Login error', err));
       }
+      // TODO: do some sort of error checking that username and password has been entered
     }
   })
 )(LoginContainer)

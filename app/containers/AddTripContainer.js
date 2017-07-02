@@ -48,15 +48,13 @@ export default compose(
       if (verified) {
         addNewTrip(addTrip.name, uid, userProfile.firstName)
           .then(data => {
-            console.log('Trip Added', data);
             addTripApi(data);
             clearTripName();
             goToHome();
           })
           .catch(err => console.log('Error adding trip', err))
-      } else {
-        console.log('Could not login user');
       }
+      // TODO: do some sort of error checking that adding trip is not null
     }
   })
 )(AddTripContainer)

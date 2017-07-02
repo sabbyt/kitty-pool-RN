@@ -9,7 +9,7 @@ export const loginApi = ({ username, password }) => {
     return await firebase.auth()
       .signInWithEmailAndPassword(username, password)
       .then(data => data)
-      .catch(err => console.log(err));
+      .catch(err => console.log('Error signing in user', err));
   }
 }
 
@@ -27,11 +27,7 @@ export const createUser = (userId, firstName, lastName, email, phoneNumber) => {
         profile,
         trips: {}
       })
-      .then(data => {
-        console.log('Added new user');
-        console.log(data);
-        dispatch(setUserProfile(profile));
-      })
-      .catch(err => console.log(err));
+      .then(data => dispatch(setUserProfile(profile)))
+      .catch(err => console.log('Error creating user on db', err));
   }
 }

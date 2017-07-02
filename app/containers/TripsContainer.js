@@ -56,15 +56,15 @@ export default compose(
       // Get user profile and trips
       this.props.getUserProfile(this.props.uid)
         .then(data => {
-          console.log('Setting user profile', data);
+          // Setting user profile from db
           this.props.setUserProfile(data.profile);
           this.props.setUserSubscription(data.subscribed);
           if (data.trips) {
-            console.log('Setting trips', data.trips);
+            // If user has trips, sets user trip data from db
             this.props.setTrips(data.trips);
           }
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log('Error getting user profile', err));
     }
   }),
   withHandlers({

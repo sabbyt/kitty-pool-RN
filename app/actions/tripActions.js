@@ -45,7 +45,7 @@ export const selectTripAndFetchData = (selectedTrip) => {
       .ref(`/trips/${selectedTrip}`)
       .once('value')
       .then(data => data.val())
-      .catch(err => console.log(err));
+      .catch(err => console.log('Error getting trip data from db', err));
     dispatch(selectTrip(fetchedData));
     dispatch(isFetchingTripData(false));
   }
@@ -74,6 +74,6 @@ export const addNewTrip = (name, uid, userName) => {
       .ref()
       .update(updates)
       .then(_ => ({id: newTripKey, data: tripInitData}))
-      .catch(err => console.log(err));
+      .catch(err => console.log('Error adding new trip to db', err));
   }
 }

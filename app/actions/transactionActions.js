@@ -35,10 +35,9 @@ export const addNewPayment = (trip, newTransactionData) => {
       .ref()
       .update(updates)
       .then(_ => {
-        console.log('Added new transaction to firebase');
         // Reset add transaction form
         dispatch(clearPaymentForm());
       })
-      .catch(err => console.log(err));
+      .catch(err => console.log('Error adding new transaction to db, 'err));
   }
 }

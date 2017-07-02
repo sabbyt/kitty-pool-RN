@@ -51,6 +51,7 @@ export default compose(
   ),
   withHandlers({
     addUser: () => () => {
+      // TODO: add new user
       console.log('adding user');
     },
     showDetails: ({ goToPage }) => () => {

@@ -29,6 +29,6 @@ export const getUserProfile = (uid) => {
       .ref(`/users/${uid}`)
       .once('value')
       .then(data => data.val())
-      .catch(err => console.log(err));
+      .catch(err => console.log('Error getting user profile from db', err));
   }
 }
